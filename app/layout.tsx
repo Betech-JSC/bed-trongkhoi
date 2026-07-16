@@ -4,7 +4,7 @@ import { Inter } from 'next/font/google';
 const inter = Inter({ subsets: ['latin', 'vietnamese'] });
 
 export const metadata = {
-  title: 'Web Thiệp Cưới Online',
+  title: 'Khoi&Van',
   description: 'Tạo thiệp cưới online chuyên nghiệp và nhanh chóng',
   icons: {
     icon: '/favicon.png',
