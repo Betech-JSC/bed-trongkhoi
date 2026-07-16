@@ -58,9 +58,9 @@ async function main() {
         gallery: true,
         gift: true,
       }),
-      bankName: 'vietcombank',
-      bankAccount: '0411001092886',
-      bankHolderName: 'LE HUU QUAN',
+      bankName: '',
+      bankAccount: '',
+      bankHolderName: '',
     }
   });
 
