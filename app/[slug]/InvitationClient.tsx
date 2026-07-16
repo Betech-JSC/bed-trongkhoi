@@ -189,9 +189,7 @@ export default function InvitationClient({ wedding, guestName }: Props) {
   const [isOpening, setIsOpening] = useState(false);
   const [isOpened, setIsOpened] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isRsvpSubmitting, setIsRsvpSubmitting] = useState(false);
-  const [rsvpMessage, setRsvpMessage] = useState<string | null>(null);
-  const [rsvpError, setRsvpError] = useState<string | null>(null);
+
   const [activePhotoIdx, setActivePhotoIdx] = useState<number | null>(null);
   
   const albumPhotosList: string[] = JSON.parse(wedding.albumPhotos || '[]');
@@ -296,32 +294,7 @@ export default function InvitationClient({ wedding, guestName }: Props) {
     return () => clearInterval(timer);
   }, [wedding.weddingDate, wedding.ceremonyTime]);
 
-  const [rsvpForm, setRsvpForm] = useState({
-    guest_name: guestName || '',
-    relation: '',
-    wishes: '',
-    attendance_status: 'attending',
-  });
 
-  const [isRelationOpen, setIsRelationOpen] = useState(false);
-  const relationRef = useRef<HTMLDivElement | null>(null);
-
-  const relationOptions = [
-    { value: 'Bạn Chú Rể', label: 'Bạn Chú Rể' },
-    { value: 'Bạn Cô Dâu', label: 'Bạn Cô Dâu' },
-    { value: 'Họ Hàng Nhà Trai', label: 'Họ Hàng Nhà Trai' },
-    { value: 'Họ Hàng Nhà Gái', label: 'Họ Hàng Nhà Gái' }
-  ];
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (relationRef.current && !relationRef.current.contains(event.target as Node)) {
-        setIsRelationOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -378,44 +351,7 @@ export default function InvitationClient({ wedding, guestName }: Props) {
     }, 3500);
   };
 
-  const handleRsvpSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsRsvpSubmitting(true);
-    setRsvpMessage(null);
-    setRsvpError(null);
 
-    if (!rsvpForm.relation) {
-      setRsvpError('Vui lòng chọn mối quan hệ.');
-      setIsRsvpSubmitting(false);
-      return;
-    }
-
-    try {
-      const res = await fetch(`/api/rsvp/${encodeURIComponent(wedding.slug)}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(rsvpForm),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setRsvpMessage(data.message);
-        setRsvpForm({
-          guest_name: guestName || '',
-          relation: '',
-          wishes: '',
-          attendance_status: 'attending',
-        });
-      } else {
-        setRsvpError(data.message || 'Đã xảy ra lỗi. Vui lòng thử lại.');
-      }
-    } catch (err: any) {
-      setRsvpError('Có lỗi kết nối. Hãy kiểm tra lại mạng.');
-    } finally {
-      setIsRsvpSubmitting(false);
-    }
-  };
 
   const getVietQrLink = () => {
     if (!wedding.bankName || !wedding.bankAccount) return '';
@@ -961,134 +897,7 @@ export default function InvitationClient({ wedding, guestName }: Props) {
           </ScrollReveal>
         )}
 
-        {/* Section 7: RSVP Form */}
-        {sections.rsvp && (
-          <ScrollReveal>
-            <div className="py-10 px-6 bg-white border-b border-slate-100">
-              <div className="text-center mb-8">
-                <h3 className="font-script text-4xl text-[#7d1f2a] mb-2">Xác Nhận Tham Dự</h3>
-                <p className="text-xs text-slate-400 font-body">Sự hiện diện của quý khách là niềm vinh hạnh lớn!</p>
-              </div>
 
-              <form onSubmit={handleRsvpSubmit} className="space-y-5 font-body">
-                <div>
-                  <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">Tên khách mời *</label>
-                  <input 
-                    type="text" 
-                    required
-                    placeholder="Tên của bạn..."
-                    value={rsvpForm.guest_name}
-                    onChange={e => setRsvpForm({ ...rsvpForm, guest_name: e.target.value })}
-                    className="w-full text-sm border-slate-200 rounded-xl px-4 py-2.5 focus:border-[#7d1f2a] focus:ring focus:ring-[#7d1f2a]/20"
-                  />
-                </div>
-
-                <div className="relative font-body" ref={relationRef}>
-                  <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">Bạn là khách của? *</label>
-                  
-                  <button
-                    type="button"
-                    onClick={() => setIsRelationOpen(!isRelationOpen)}
-                    className="w-full flex items-center justify-between text-left text-sm border border-slate-200 rounded-xl px-4 py-2.5 bg-white focus:border-[#7d1f2a] focus:ring focus:ring-[#7d1f2a]/20 transition-all shadow-xs"
-                  >
-                    <span className={rsvpForm.relation ? "text-slate-800 font-medium" : "text-slate-400"}>
-                      {relationOptions.find(opt => opt.value === rsvpForm.relation)?.label || '-- Chọn quan hệ --'}
-                    </span>
-                    <svg 
-                      className={`w-4 h-4 text-slate-400 transition-transform duration-300 ${isRelationOpen ? 'transform rotate-180' : ''}`} 
-                      fill="none" 
-                      stroke="currentColor" 
-                      viewBox="0 0 24 24"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
-
-                  {isRelationOpen && (
-                    <div className="absolute left-0 right-0 mt-1.5 z-40 bg-white border border-slate-100 rounded-xl shadow-xl overflow-hidden animate-[fadeIn_0.2s_ease-out]">
-                      {relationOptions.map((opt) => (
-                        <button
-                          key={opt.value}
-                          type="button"
-                          onClick={() => {
-                            setRsvpForm({ ...rsvpForm, relation: opt.value });
-                            setIsRelationOpen(false);
-                          }}
-                          className={`w-full text-left text-xs font-semibold px-4 py-3 border-b border-slate-50 last:border-b-0 transition-colors ${
-                            rsvpForm.relation === opt.value
-                              ? 'bg-[#7d1f2a] text-white'
-                              : 'text-slate-600 hover:bg-[#7d1f2a]/5 hover:text-[#7d1f2a]'
-                          }`}
-                        >
-                          {opt.label}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">Bạn có tham dự được không? *</label>
-                  <div className="grid grid-cols-2 gap-3 text-center">
-                    <button
-                      type="button"
-                      onClick={() => setRsvpForm({ ...rsvpForm, attendance_status: 'attending' })}
-                      className={`py-3 px-3 text-xs font-semibold rounded-xl border transition-all ${
-                        rsvpForm.attendance_status === 'attending'
-                          ? 'bg-[#7d1f2a] text-white border-[#7d1f2a] shadow-sm'
-                          : 'bg-white text-slate-600 border-slate-200'
-                      }`}
-                    >
-                      Có, mình sẽ đến!
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setRsvpForm({ ...rsvpForm, attendance_status: 'absent' })}
-                      className={`py-3 px-3 text-xs font-semibold rounded-xl border transition-all ${
-                        rsvpForm.attendance_status === 'absent'
-                          ? 'bg-[#7d1f2a] text-white border-[#7d1f2a] shadow-sm'
-                          : 'bg-white text-slate-600 border-slate-200'
-                      }`}
-                    >
-                      Tiếc quá, bận mất rồi
-                    </button>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">Gửi lời chúc tốt đẹp nhất</label>
-                  <textarea 
-                    rows={3}
-                    placeholder="Lời chúc ý nghĩa dành cho Dâu Rể..."
-                    value={rsvpForm.wishes}
-                    onChange={e => setRsvpForm({ ...rsvpForm, wishes: e.target.value })}
-                    className="w-full text-sm border-slate-200 rounded-xl px-4 py-2.5 focus:border-[#7d1f2a] focus:ring focus:ring-[#7d1f2a]/20"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={isRsvpSubmitting}
-                  className="w-full bg-[#7d1f2a] hover:bg-[#681922] text-white font-bold font-body tracking-wider py-3.5 px-4 rounded-xl text-xs transition-colors shadow-sm disabled:bg-slate-300 btn-gold-sweep"
-                >
-                  {isRsvpSubmitting ? 'ĐANG GỬI...' : 'GỬI LỜI XÁC NHẬN'}
-                </button>
-
-                {rsvpMessage && (
-                  <div className="p-3 bg-emerald-50 text-emerald-800 text-xs font-semibold rounded-xl border border-emerald-100 text-center">
-                    {rsvpMessage}
-                  </div>
-                )}
-
-                {rsvpError && (
-                  <div className="p-3 bg-rose-50 text-rose-800 text-xs font-semibold rounded-xl border border-rose-100 text-center">
-                    {rsvpError}
-                  </div>
-                )}
-              </form>
-            </div>
-          </ScrollReveal>
-        )}
 
         {/* Section 8: Gift Box / Bank Transfers */}
         {sections.gift && (
