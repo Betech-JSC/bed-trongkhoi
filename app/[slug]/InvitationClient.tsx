@@ -192,7 +192,6 @@ export default function InvitationClient({ wedding, guestName }: Props) {
   const [isRsvpSubmitting, setIsRsvpSubmitting] = useState(false);
   const [rsvpMessage, setRsvpMessage] = useState<string | null>(null);
   const [rsvpError, setRsvpError] = useState<string | null>(null);
-  const [showGiftModal, setShowGiftModal] = useState(false);
   const [activePhotoIdx, setActivePhotoIdx] = useState<number | null>(null);
   
   const albumPhotosList: string[] = JSON.parse(wedding.albumPhotos || '[]');
@@ -1094,21 +1093,52 @@ export default function InvitationClient({ wedding, guestName }: Props) {
         {/* Section 8: Gift Box / Bank Transfers */}
         {sections.gift && wedding.bankAccount && (
           <ScrollReveal>
-            <div className="py-10 px-6 bg-white text-center flex flex-col items-center">
+            <div className="py-10 px-6 bg-white text-center flex flex-col items-center border-b border-slate-100">
               <h3 className="font-script text-4xl text-[#7d1f2a] mb-4">Gửi Mừng Cưới</h3>
-              <p className="text-xs font-body text-slate-500 max-w-[280px] mb-8 leading-relaxed">
-                Nếu bạn muốn gửi quà mừng cưới trực tiếp, bạn có thể quét mã QR chuyển khoản hoặc xem thông tin tài khoản bên dưới.
+              <p className="text-xs font-body text-slate-500 max-w-[280px] mb-6 leading-relaxed">
+                Nếu bạn muốn gửi quà mừng cưới trực tiếp, bạn có thể quét mã QR chuyển khoản hoặc chuyển khoản theo thông tin bên dưới.
               </p>
               
-              <button
-                onClick={() => setShowGiftModal(true)}
-                className="bg-[#7d1f2a] hover:bg-[#681922] text-white font-bold font-body py-3.5 px-8 rounded-full text-xs tracking-wider shadow-md flex items-center gap-2 transition-all btn-gold-sweep"
-              >
-                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                XEM SỐ TÀI KHOẢN &amp; QR
-              </button>
+              <div className="flex flex-col items-center bg-[#faf6f0] border border-[#ebdcb9]/40 rounded-3xl p-6 shadow-xs w-full max-w-[340px] mb-2 font-body">
+                {/* QR Code */}
+                <div className="h-48 w-48 border border-slate-200 p-2 bg-white rounded-2xl shadow-xs flex items-center justify-center overflow-hidden mb-4">
+                  <img 
+                    src="/images/qr_code.png" 
+                    alt="QR code" 
+                    className="h-full w-full object-contain"
+                  />
+                </div>
+                
+                {/* Bank Account Info */}
+                <div className="w-full text-slate-700 text-xs space-y-1.5 text-center mt-2 border-t border-[#ebdcb9]/30 pt-4">
+                  <div>
+                    <span className="text-slate-400 font-bold uppercase tracking-wider text-[9px] block">Ngân hàng</span>
+                    <span className="font-bold text-slate-800 text-sm uppercase">{wedding.bankName}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 font-bold uppercase tracking-wider text-[9px] block">Số tài khoản</span>
+                    <div className="flex items-center justify-center gap-1.5">
+                      <span className="font-bold text-slate-800 text-sm">{wedding.bankAccount}</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (wedding.bankAccount) {
+                            navigator.clipboard.writeText(wedding.bankAccount);
+                            alert('Đã sao chép số tài khoản!');
+                          }
+                        }}
+                        className="text-[#7d1f2a] hover:underline font-bold text-[10px] bg-[#7d1f2a]/5 px-2 py-0.5 rounded cursor-pointer"
+                      >
+                        Copy
+                      </button>
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 font-bold uppercase tracking-wider text-[9px] block">Chủ tài khoản</span>
+                    <span className="font-bold text-slate-800 text-xs uppercase">{wedding.bankHolderName}</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </ScrollReveal>
         )}
@@ -1164,40 +1194,6 @@ export default function InvitationClient({ wedding, guestName }: Props) {
         </div>
       )}
 
-      {/* Gift Modal Popup */}
-      {showGiftModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm">
-          <div className="bg-white rounded-3xl w-full max-w-[340px] overflow-hidden shadow-2xl animate-[fadeIn_0.3s_ease-out] border border-slate-100">
-            <div className="bg-[#7d1f2a] text-white p-5 text-center relative font-title">
-              <h4 className="text-lg">Thông Tin Mừng Cưới</h4>
-              <button 
-                onClick={() => setShowGiftModal(false)}
-                className="absolute top-4 right-4 text-white/80 hover:text-white"
-                aria-label="Close Gift Modal"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            
-            <div className="p-6 text-center font-body flex flex-col items-center justify-center space-y-4">
-              {wedding.bankAccount && (
-                <div className="flex flex-col items-center">
-                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-2">Quét mã để chuyển khoản nhanh</p>
-                  <div className="h-56 w-56 border border-slate-200 p-2 bg-white rounded-2xl shadow-sm flex items-center justify-center overflow-hidden">
-                    <img 
-                      src="/images/qr_code.png" 
-                      alt="QR code" 
-                      className="h-full w-full object-contain"
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
