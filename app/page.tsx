@@ -1,13 +1,20 @@
 import db from '@/lib/db';
 import InvitationClient from './[slug]/InvitationClient';
 
+export const dynamic = 'force-dynamic';
+
 export default async function WelcomePage({
   searchParams,
 }: {
   searchParams?: { [key: string]: string | string[] | undefined };
 }) {
   // Get the first wedding record (since it's a single invitation website now)
-  const wedding = await db.wedding.findFirst();
+  let wedding = null;
+  try {
+    wedding = await db.wedding.findFirst();
+  } catch (error) {
+    console.error('Error fetching wedding from database:', error);
+  }
 
   if (!wedding) {
     return (

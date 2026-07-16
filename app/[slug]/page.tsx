@@ -2,6 +2,8 @@ import db from '@/lib/db';
 import { notFound } from 'next/navigation';
 import InvitationClient from './InvitationClient';
 
+export const dynamic = 'force-dynamic';
+
 export default async function InvitationPage({
   params,
   searchParams,
@@ -12,14 +14,19 @@ export default async function InvitationPage({
   const { slug } = params;
   const decodedSlug = decodeURIComponent(slug);
 
-  const wedding = await db.wedding.findFirst({
-    where: {
-      OR: [
-        { slug: slug },
-        { slug: decodedSlug }
-      ]
-    }
-  });
+  let wedding = null;
+  try {
+    wedding = await db.wedding.findFirst({
+      where: {
+        OR: [
+          { slug: slug },
+          { slug: decodedSlug }
+        ]
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching wedding from database:', error);
+  }
 
   if (!wedding) {
     notFound();
