@@ -1091,17 +1091,17 @@ export default function InvitationClient({ wedding, guestName }: Props) {
         )}
 
         {/* Section 8: Gift Box / Bank Transfers */}
-        {sections.gift && wedding.bankAccount && (
+        {sections.gift && (
           <ScrollReveal>
             <div className="py-10 px-6 bg-white text-center flex flex-col items-center border-b border-slate-100">
               <h3 className="font-script text-4xl text-[#7d1f2a] mb-4">Gửi Mừng Cưới</h3>
               <p className="text-xs font-body text-slate-500 max-w-[280px] mb-6 leading-relaxed">
-                Nếu bạn muốn gửi quà mừng cưới trực tiếp, bạn có thể quét mã QR chuyển khoản hoặc chuyển khoản theo thông tin bên dưới.
+                Nếu bạn muốn gửi quà mừng cưới trực tiếp, bạn có thể quét mã QR chuyển khoản dưới đây.
               </p>
               
               <div className="flex flex-col items-center bg-[#faf6f0] border border-[#ebdcb9]/40 rounded-3xl p-6 shadow-xs w-full max-w-[340px] mb-2 font-body">
                 {/* QR Code */}
-                <div className="h-48 w-48 border border-slate-200 p-2 bg-white rounded-2xl shadow-xs flex items-center justify-center overflow-hidden mb-4">
+                <div className="h-48 w-48 border border-slate-200 p-2 bg-white rounded-2xl shadow-xs flex items-center justify-center overflow-hidden">
                   <img 
                     src="/images/qr_code.png" 
                     alt="QR code" 
@@ -1110,34 +1110,36 @@ export default function InvitationClient({ wedding, guestName }: Props) {
                 </div>
                 
                 {/* Bank Account Info */}
-                <div className="w-full text-slate-700 text-xs space-y-1.5 text-center mt-2 border-t border-[#ebdcb9]/30 pt-4">
-                  <div>
-                    <span className="text-slate-400 font-bold uppercase tracking-wider text-[9px] block">Ngân hàng</span>
-                    <span className="font-bold text-slate-800 text-sm uppercase">{wedding.bankName}</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-400 font-bold uppercase tracking-wider text-[9px] block">Số tài khoản</span>
-                    <div className="flex items-center justify-center gap-1.5">
-                      <span className="font-bold text-slate-800 text-sm">{wedding.bankAccount}</span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (wedding.bankAccount) {
-                            navigator.clipboard.writeText(wedding.bankAccount);
-                            alert('Đã sao chép số tài khoản!');
-                          }
-                        }}
-                        className="text-[#7d1f2a] hover:underline font-bold text-[10px] bg-[#7d1f2a]/5 px-2 py-0.5 rounded cursor-pointer"
-                      >
-                        Copy
-                      </button>
+                {wedding.bankAccount && (
+                  <div className="w-full text-slate-700 text-xs space-y-1.5 text-center mt-4 border-t border-[#ebdcb9]/30 pt-4">
+                    <div>
+                      <span className="text-slate-400 font-bold uppercase tracking-wider text-[9px] block">Ngân hàng</span>
+                      <span className="font-bold text-slate-800 text-sm uppercase">{wedding.bankName}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 font-bold uppercase tracking-wider text-[9px] block">Số tài khoản</span>
+                      <div className="flex items-center justify-center gap-1.5">
+                        <span className="font-bold text-slate-800 text-sm">{wedding.bankAccount}</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (wedding.bankAccount) {
+                              navigator.clipboard.writeText(wedding.bankAccount);
+                              alert('Đã sao chép số tài khoản!');
+                            }
+                          }}
+                          className="text-[#7d1f2a] hover:underline font-bold text-[10px] bg-[#7d1f2a]/5 px-2 py-0.5 rounded cursor-pointer"
+                        >
+                          Copy
+                        </button>
+                      </div>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 font-bold uppercase tracking-wider text-[9px] block">Chủ tài khoản</span>
+                      <span className="font-bold text-slate-800 text-xs uppercase">{wedding.bankHolderName}</span>
                     </div>
                   </div>
-                  <div>
-                    <span className="text-slate-400 font-bold uppercase tracking-wider text-[9px] block">Chủ tài khoản</span>
-                    <span className="font-bold text-slate-800 text-xs uppercase">{wedding.bankHolderName}</span>
-                  </div>
-                </div>
+                )}
               </div>
             </div>
           </ScrollReveal>
