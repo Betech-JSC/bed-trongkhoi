@@ -174,6 +174,17 @@ function ScrollReveal({ children }: { children: React.ReactNode }) {
   );
 }
 
+// 2b. Memoized Map Section to prevent iframe reload/flicker on state updates
+const MapSection = React.memo(({ iframeHtml }: { iframeHtml: string }) => {
+  return (
+    <div 
+      className="w-full h-64 border border-slate-200 rounded-3xl overflow-hidden shadow-sm [&_iframe]:w-full [&_iframe]:h-full"
+      dangerouslySetInnerHTML={{ __html: iframeHtml }}
+    />
+  );
+});
+MapSection.displayName = 'MapSection';
+
 export default function InvitationClient({ wedding, guestName }: Props) {
   const [isOpening, setIsOpening] = useState(false);
   const [isOpened, setIsOpened] = useState(false);
@@ -943,15 +954,9 @@ export default function InvitationClient({ wedding, guestName }: Props) {
             <div className="py-10 px-6 bg-white border-b border-slate-100 text-center">
               <h3 className="font-script text-4xl text-[#7d1f2a] mb-8">Địa Điểm Trên Bản Đồ</h3>
               {wedding.partyMapIframe ? (
-                <div 
-                  className="w-full h-64 border border-slate-200 rounded-3xl overflow-hidden shadow-sm [&_iframe]:w-full [&_iframe]:h-full"
-                  dangerouslySetInnerHTML={{ __html: wedding.partyMapIframe }}
-                />
+                <MapSection iframeHtml={wedding.partyMapIframe} />
               ) : wedding.ceremonyMapIframe ? (
-                <div 
-                  className="w-full h-64 border border-slate-200 rounded-3xl overflow-hidden shadow-sm [&_iframe]:w-full [&_iframe]:h-full"
-                  dangerouslySetInnerHTML={{ __html: wedding.ceremonyMapIframe }}
-                />
+                <MapSection iframeHtml={wedding.ceremonyMapIframe} />
               ) : null}
             </div>
           </ScrollReveal>
